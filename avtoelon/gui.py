@@ -12,6 +12,18 @@ class CheckButton:
             master, text=title, variable=self.var,
             onvalue=self.url, offvalue="", anchor=W, bg="white")
         self.cb.pack(fill=X)
+    
+        def enter_leave(event):
+            if str(event.type) == 'Enter':
+                event.widget['bg'] = 'grey'
+            elif str(event.type) == 'Leave':
+                event.widget['bg'] = 'white'
+    
+        self.cb.bind('<Enter>', enter_leave)
+        self.cb.bind('<Leave>', enter_leave)
+
+
+
 
 
 
@@ -33,7 +45,7 @@ class ScrollBar:
 
 
         # Configure mousewheel
-        def on_mousewheel(self, event):
+        def on_mousewheel(event):
             self.my_canvas.yview_scroll(int(-1*(event.delta/120)), "units")
         self.my_canvas.bind_all("<MouseWheel>", on_mousewheel)
 
