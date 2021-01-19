@@ -26,6 +26,14 @@ my_canvas.bind('<Configure>', lambda e: my_canvas.configure(scrollregion = my_ca
 
 
 
+def on_mousewheel(event):
+    my_canvas.yview_scroll(-1*(event.delta/120), "units")
+
+my_canvas.bind_all("<MouseWheel>", on_mousewheel)
+
+
+
+
 
 # Create Another Frame INSIDE the canvas
 frame_in_canvas  = Frame(my_canvas)
