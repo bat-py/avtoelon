@@ -10,17 +10,17 @@ class CheckButton:
         self.url = url
         self.cb = Checkbutton(
             master, text=title, variable=self.var,
-            onvalue=self.url, offvalue="", anchor=W, bg="white")
+            onvalue=self.url, offvalue="", anchor=W,  bg="white")
         self.cb.pack(fill=X)
     
-        def enter_leave(event):
-            if str(event.type) == 'Enter':
-                event.widget['bg'] = 'grey'
-            elif str(event.type) == 'Leave':
+        def enter_func(event):
+            event.widget['bg'] = 'grey'
+
+        def leave_func(event):
                 event.widget['bg'] = 'white'
     
-        self.cb.bind('<Enter>', enter_leave)
-        self.cb.bind('<Leave>', enter_leave)
+        self.cb.bind('<Enter>', enter_func)
+        self.cb.bind('<Leave>', leave_func)
 
 
 
@@ -32,7 +32,7 @@ class ScrollBar:
         self.main_frame = main_frame
 
         # Create a Canvas
-        self.my_canvas = Canvas(self.main_frame)
+        self.my_canvas = Canvas(self.main_frame, bg='green')
         self.my_canvas.pack(side=LEFT, fill=BOTH, expand=1)
 
         # Add a scrollbar to the canvas
@@ -41,22 +41,27 @@ class ScrollBar:
 
         # Configure The Canvas
         self.my_canvas.configure(yscrollcommand=self.my_scrollbar.set)
-        self.my_canvas.bind('<Configure>', lambda e: self.my_canvas.configure(scrollregion = self.my_canvas.bbox("all")))
-
 
         # Configure mousewheel
-        def on_mousewheel(event):
-            self.my_canvas.yview_scroll(int(-1*(event.delta/120)), "units")
-        self.my_canvas.bind_all("<MouseWheel>", on_mousewheel)
+#55
+        self.my_canvas.bind_all("<MouseWheel>", self.on_mousewheel)
 
         # Create Another Frame INSIDE the canvas
         self.frame_in_canvas  = Frame(self.my_canvas)
 
         # Add that New Frame to a Window in the canvas
-        self.my_canvas.create_window((0,0), window=self.frame_in_canvas, anchor=N+W)
+        self.my_canvas.create_window((0,0), window=self.frame_in_canvas, anchor="nw", tags="my_tag")
 
-    
+        self.my_canvas.bind('<Configure>', self.canvas_configure)
 
+
+    def on_mousewheel(self, event):
+        self.my_canvas.yview_scroll(int(-1*(event.delta/120)), "units")
+
+    def canvas_configure(self, event):
+        self.width = event.width - 4
+        self.my_canvas.itemconfigure("my_tag", width=self.width)
+        self.my_canvas.configure(scrollregion=self.my_canvas.bbox("all"))
 
 
 def first_page(root):
@@ -67,8 +72,8 @@ def first_page(root):
     lab.config(font=("Arial", 14, "bold"))
 
 
-# В этом фрэйме будет список профессий чтобы в виде checkbox  
-    inner_frame = Frame(first_windows,  bg="white", width=500, height=280)
+# В этом фрэйме будет список профессий чтобы в виде checkbox
+    inner_frame = Frame(first_windows,  bg="white", width=500, height=280, bd=2, relief=GROOVE)
 
     dic_item = my_parser.list_jobs()
     list_item = dic_item.items()
