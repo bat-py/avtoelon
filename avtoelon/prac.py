@@ -26,11 +26,16 @@ my_canvas.bind('<Configure>', lambda e: my_canvas.configure(scrollregion = my_ca
 
 
 
+# Configure mousewheel
 def on_mousewheel(event):
-    my_canvas.yview_scroll(-1*(event.delta/120), "units")
+    my_canvas.yview_scroll(int(-1*(event.delta/120)), "units")
 
-my_canvas.bind_all("<MouseWheel>", on_mousewheel)
+# For Windows
+#my_canvas.bind_all("<MouseWheel>", on_mousewheel)
 
+# For X11
+my_canvas.bind_all("<Button-4>", on_mousewheel)
+my_canvas.bind_all("<Button-5>", on_mousewheel)
 
 
 
