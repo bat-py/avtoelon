@@ -1,5 +1,6 @@
 from tkinter import *
 from tkinter import ttk
+from tkinter import messagebox
 import my_parser
 
 class CheckButton:
@@ -19,8 +20,6 @@ class CheckButton:
 
     def leave_func(self, event):
             event.widget['bg'] = 'white'
-
-
 
 
 class ScrollBar:
@@ -58,12 +57,34 @@ class ScrollBar:
         self.my_canvas.configure(scrollregion=self.my_canvas.bbox("all"))      # Без него список можно прокручивать бесконечно, даже если елементы закончились
 
 
+def all_on_off(change):
+    if change == "on":
+        for ch in buttons:
+            ch.cb.select()
+    elif change == "off":
+        for ch in buttons:
+            ch.cb.deselect()
+
+
+def next_page_button(first_window):
+    checked_buttons = []
+    for ch in buttons:
+        if ch.var.get():
+            checked_buttons.append(str(ch.var.get()))
+
+    if checked_buttons:
+        first_window.destroy()
+        second_page(checked_buttons)
+    else:
+        messagebox.showwarning("Ошибка!", "Вы не выбрали ни одну профессию\nПожалуйста выберите хотябы одну профессию")
+
+
 def first_page(root):
     first_windows = Frame(root)
     first_windows.pack(fill=BOTH, expand=1)
     
     lab = Label(first_windows, text='Пожалуйста выберите нужные вам профессии')
-    lab.config(font=("Arial", 14, "bold"))
+    lab.config(font=("Calibri", 14, "bold"))
 
 
     # Получаем список профессий
@@ -71,23 +92,35 @@ def first_page(root):
     list_item = dic_item.items()
 
     # В этом фрэйме будет список профессий чтобы в виде checkbox
-    inner_frame = Frame(first_windows,  bg="white", width=500, height=280, bd=2, relief=GROOVE)
+    inner_frame = Frame(first_windows,  bg="white", width=500, height=260, bd=2, relief=GROOVE)
 
     # Создаем объект который имеет прокрутку
     frame_in_canvas = ScrollBar(inner_frame)
     
+    global buttons
     buttons = []
     for name, url in list_item:
         buttons.append(CheckButton(frame_in_canvas.frame_in_canvas, name, url))
     
 
+    # Кнопки "Все ВКЛ", "Все ОТКЛ"
+    buttons_on_off = Frame(first_windows)
+    Button(buttons_on_off, text="Все ВКЛ", padx=6, font="Calibri 11", relief=GROOVE, command=lambda: all_on_off("on")).pack(side=LEFT, padx=(25, 6))
+    Button(buttons_on_off, text="Все ВЫКЛ", padx=6, font="Calibri 11", relief=GROOVE, command=lambda: all_on_off("off")).pack(side=RIGHT)
+
+
 
     # Кнопка Далее
-    but = Button(first_windows, text="Далее", padx=5, pady=2, font="Arial")
+    but = Button(first_windows, text="Далее", padx=6, bd=2, relief=GROOVE, font="Calibri", command=lambda: next_page_button(first_windows))
 
 
     # Pack system
     lab.pack(pady=18)
     inner_frame.pack()
     inner_frame.pack_propagate(False)
+    buttons_on_off.pack(side=LEFT)
     but.pack(padx=25, pady=15, side=RIGHT)
+
+
+def second_page(checked_buttons):
+    print(checked_buttons)

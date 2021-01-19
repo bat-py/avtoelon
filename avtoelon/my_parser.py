@@ -12,9 +12,6 @@ def get_html(url, params=None):
     return page
 
 
-
-
-
 # Вернет список работ по профессиям c ссылками
 def list_jobs():
     html = get_html("/catalog")
@@ -33,6 +30,14 @@ def list_jobs():
         return dic_item 
     else:
         return 0
+
+
+
+
+
+def list_vacancies(urls):
+    htmls = []
+    for url in urls:
 
 
 
