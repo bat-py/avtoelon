@@ -6,15 +6,13 @@ class CheckButton:
     def __init__(self, master, title, url):
         self.var = StringVar()
         self.var.set("")
-        self.title = title
-        self.url = url
         self.cb = Checkbutton(
             master, text=title, variable=self.var,
-            onvalue=self.url, offvalue="", anchor=W,  bg="white")
+            onvalue=url, offvalue="", anchor=W,  bg="white")
         self.cb.pack(fill=X)
 
-        self.cb.bind('<Enter>', self.enter_func)
-        self.cb.bind('<Leave>', self.leave_func)
+        self.cb.bind('<Enter>', self.enter_func)                 # Запустит метод enter_func если мышка находится в этом виджете
+        self.cb.bind('<Leave>', self.leave_func)                 # Запустит leave_func как только мышка покинет зону виджета
 
     def enter_func(self, event):
             event.widget['bg'] = 'grey'
@@ -27,14 +25,12 @@ class CheckButton:
 
 class ScrollBar:
     def __init__(self, main_frame):
-        self.main_frame = main_frame
-
         # Create a Canvas
-        self.my_canvas = Canvas(self.main_frame)
+        self.my_canvas = Canvas(main_frame)
         self.my_canvas.pack(side=LEFT, fill=BOTH, expand=1)
 
         # Add a scrollbar to the canvas
-        self.my_scrollbar = ttk.Scrollbar(self.main_frame, orient=VERTICAL, command=self.my_canvas.yview)
+        self.my_scrollbar = ttk.Scrollbar(main_frame, orient=VERTICAL, command=self.my_canvas.yview)
         self.my_scrollbar.pack(side=RIGHT, fill=Y)
 
         # Configure The Canvas
@@ -64,18 +60,20 @@ class ScrollBar:
 
 def first_page(root):
     first_windows = Frame(root)
-    first_windows.pack(fill=BOTH)
+    first_windows.pack(fill=BOTH, expand=1)
     
     lab = Label(first_windows, text='Пожалуйста выберите нужные вам профессии')
     lab.config(font=("Arial", 14, "bold"))
 
 
-# В этом фрэйме будет список профессий чтобы в виде checkbox
-    inner_frame = Frame(first_windows,  bg="white", width=500, height=280, bd=2, relief=GROOVE)
-
+    # Получаем список профессий
     dic_item = my_parser.list_jobs()
     list_item = dic_item.items()
 
+    # В этом фрэйме будет список профессий чтобы в виде checkbox
+    inner_frame = Frame(first_windows,  bg="white", width=500, height=280, bd=2, relief=GROOVE)
+
+    # Создаем объект который имеет прокрутку
     frame_in_canvas = ScrollBar(inner_frame)
     
     buttons = []
@@ -84,10 +82,11 @@ def first_page(root):
     
 
 
-# Переход на 2 страницу
+    # Кнопка Далее
     but = Button(first_windows, text="Далее", padx=5, pady=2, font="Arial")
 
-# Pack system
+
+    # Pack system
     lab.pack(pady=18)
     inner_frame.pack()
     inner_frame.pack_propagate(False)
