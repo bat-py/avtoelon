@@ -1,5 +1,4 @@
 from tkinter import * 
-import parser
 import gui
 
 
@@ -10,6 +9,5 @@ root.geometry('600x400')
 root.resizable(width=False, height=False)
 
 gui.first_page(root)
-
 
 root.mainloop()
