@@ -3,12 +3,24 @@ from tkinter import ttk
 from tkinter import messagebox
 import my_parser
 
+def ending_of_the_word(num: int, word: list):
+    if 5 <= num < 21:
+        return word[2]
+    elif num%10 == 1:
+        return word[0]
+    elif 1 < num%10 < 5:
+        return word[1]
+    else:
+        return word[2]
+
+
 class CheckButton:
     def __init__(self, master, title, url):
         self.var = StringVar()
         self.var.set("")
+        self.title = title
         self.cb = Checkbutton(
-            master, text=title, variable=self.var,
+            master, text=self.title, variable=self.var,
             onvalue=url, offvalue="", anchor=W,  bg="white")
         self.cb.pack(fill=X)
 
@@ -66,23 +78,25 @@ def all_on_off(change):
             ch.cb.deselect()
 
 
-def next_page_button(first_window):
+def next_page_button(first_window, root):
     checked_buttons = []
     for ch in buttons:
         if ch.var.get():
-            checked_buttons.append(str(ch.var.get()))
+            title = ch.title
+            url = str(ch.var.get())
+
+            checked_buttons.append((title, url))
 
     if checked_buttons:
         first_window.destroy()
-        second_page(checked_buttons)
+        second_page(checked_buttons, root)
     else:
         messagebox.showwarning("Ошибка!", "Вы не выбрали ни одну профессию\nПожалуйста выберите хотябы одну профессию")
 
 
 def first_page(root):
     first_windows = Frame(root)
-    first_windows.pack(fill=BOTH, expand=1)
-    
+
     lab = Label(first_windows, text='Пожалуйста выберите нужные вам профессии')
     lab.config(font=("Calibri", 14, "bold"))
 
@@ -111,10 +125,11 @@ def first_page(root):
 
 
     # Кнопка Далее
-    but = Button(first_windows, text="Далее", padx=6, bd=2, relief=GROOVE, font="Calibri", command=lambda: next_page_button(first_windows))
+    but = Button(first_windows, text="Далее", padx=6, bd=2, relief=GROOVE, font="Calibri", command=lambda: next_page_button(first_windows, root))
 
 
     # Pack system
+    first_windows.pack(fill=BOTH, expand=1)
     lab.pack(pady=18)
     inner_frame.pack()
     inner_frame.pack_propagate(False)
@@ -122,5 +137,14 @@ def first_page(root):
     but.pack(padx=25, pady=15, side=RIGHT)
 
 
-def second_page(checked_buttons):
-    print(checked_buttons)
+def second_page(checked_buttons, root):
+    main_frame = Frame(root)
+
+    lab_text = f"Вы выбрали {len(checked_buttons)} {ending_of_the_word(len(checked_buttons), ['профессию', 'профессии', 'профессий'])}"
+    lab = Label(main_frame, text=lab_text, font=("Calibri", 14, "bold"))
+
+    # Pack System
+    main_frame.pack(fill=BOTH, expand=1)
+    lab.pack(pady=18)
+
+    
