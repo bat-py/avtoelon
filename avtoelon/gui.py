@@ -28,7 +28,7 @@ class CheckButton:
         self.cb.bind('<Leave>', self.leave_func)                 # Запустит leave_func как только мышка покинет зону виджета
 
     def enter_func(self, event):
-            event.widget['bg'] = 'grey'
+            event.widget['bg'] = '#cdcdcd'
 
     def leave_func(self, event):
             event.widget['bg'] = 'white'
@@ -97,8 +97,8 @@ def next_page_button(first_window, root):
 def first_page(root):
     first_windows = Frame(root)
 
-    lab = Label(first_windows, text='Пожалуйста выберите нужные вам профессии')
-    lab.config(font=("Calibri", 14, "bold"))
+    lab = Label(first_windows, text='Пожалуйста выберите нужные вам профессии', anchor=W )
+    lab.config(font=("Calibri", 11))
 
 
     # Получаем список профессий
@@ -106,7 +106,7 @@ def first_page(root):
     list_item = dic_item.items()
 
     # В этом фрэйме будет список профессий чтобы в виде checkbox
-    inner_frame = Frame(first_windows,  bg="white", width=500, height=260, bd=2, relief=GROOVE)
+    inner_frame = Frame(first_windows,  bg="white", width=500, height=240, bd=2, relief=GROOVE)
 
     # Создаем объект который имеет прокрутку
     frame_in_canvas = ScrollBar(inner_frame)
@@ -125,16 +125,16 @@ def first_page(root):
 
 
     # Кнопка Далее
-    but = Button(first_windows, text="Далее", padx=6, bd=2, relief=GROOVE, font="Calibri", command=lambda: next_page_button(first_windows, root))
+    but = Button(first_windows, text="Далее", padx=6, bd=2, relief=GROOVE, font="Calibri 11", command=lambda: next_page_button(first_windows, root))
 
 
     # Pack system
     first_windows.pack(fill=BOTH, expand=1)
-    lab.pack(pady=18)
+    lab.pack(pady=(15,4), fill=X, padx=15)
     inner_frame.pack()
     inner_frame.pack_propagate(False)
     buttons_on_off.pack(side=LEFT)
-    but.pack(padx=25, pady=15, side=RIGHT)
+    but.pack(padx=25, side=RIGHT)
 
 
 def second_page(checked_buttons, root):
@@ -147,4 +147,4 @@ def second_page(checked_buttons, root):
     main_frame.pack(fill=BOTH, expand=1)
     lab.pack(pady=18)
 
-    
+
