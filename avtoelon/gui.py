@@ -256,7 +256,6 @@ class SecondPage:
         self.selected_place.insert(0, self.place)
         self.selected_place.config(state=DISABLED)
 
-
     def select_place_to_save(self):
         s = filedialog.asksaveasfilename(title="Куда вы хотите сохранить файл",
                                          initialfile=self.file_name,
@@ -268,4 +267,12 @@ class SecondPage:
         self.selected_place.config(state=DISABLED)
 
     def download_data(self):
-        pass
+        if not self.selected_place:
+            if os.name == 'nt':
+                self.selected_place = os.path.dirname(__file__) + "\parsed_data." + self.file_expansion_val.get()
+            else:
+                self.selected_place = os.path.dirname(__file__) + "/parsed_data." + self.file_expansion_val.get()
+
+        self.parsed_data = []
+        for button_item in self.checked_buttons:
+            self.parsed_data.append(my_parser.GetItemsFromCatalog(button_item))
