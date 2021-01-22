@@ -12,6 +12,6 @@ top_menu = Frame(root, bg="white", height=65)
 top_menu.pack(fill=X)
 top_menu.pack_propagate(False)
 
-gui.first_page(root)
+gui.FirstPage(root)
 
 root.mainloop()

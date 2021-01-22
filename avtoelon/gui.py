@@ -71,140 +71,173 @@ class ScrollBar:
         self.my_canvas.configure(scrollregion=self.my_canvas.bbox("all"))      # Без него список можно прокручивать бесконечно, даже если елементы закончились
 
 
-def all_on_off(change):
-    if change == "on":
-        for ch in buttons:
-            ch.cb.select()
-    elif change == "off":
-        for ch in buttons:
-            ch.cb.deselect()
+class FirstPage:
+    def __init__(self, root):
+        self.root = root
+        self.first_windows = Frame(self.root)
 
+        self.lab = Label(self.first_windows, text='Пожалуйста выберите нужные вам профессии', anchor=W )
+        self.lab.config(font=("Calibri", 11))
 
-def next_page_button(first_window, root):
-    checked_buttons = []
-    for ch in buttons:
-        if ch.var.get():
-            title = ch.title
-            url = str(ch.var.get())
+        # Получаем список профессий
+        self.dic_item = my_parser.list_jobs()
+        self.list_item = self.dic_item.items()
 
-            checked_buttons.append((title, url))
+        # В этом фрэйме будет список профессий чтобы в виде checkbox
+        self.inner_frame = Frame(self.first_windows,  bg="white", width=500, height=240, bd=2, relief=GROOVE)
 
-    if checked_buttons:
-        first_window.destroy()
-        second_page(checked_buttons, root)
-    else:
-        messagebox.showwarning("Ошибка!", "Вы не выбрали ни одну профессию\nПожалуйста выберите хотябы одну профессию")
-
-def select_place_to_save(frame, input_area, file_name, file_expansion):
-    s = filedialog.asksaveasfilename(title="Куда вы хотите сохранить файл",
-                                     initialfile=file_name,
-                                     defaultextension=file_expansion)
-    print(s)
-
-
-
-def first_page(root):
-    first_windows = Frame(root)
-
-    lab = Label(first_windows, text='Пожалуйста выберите нужные вам профессии', anchor=W )
-    lab.config(font=("Calibri", 11))
-
-
-    # Получаем список профессий
-    dic_item = my_parser.list_jobs()
-    list_item = dic_item.items()
-
-    # В этом фрэйме будет список профессий чтобы в виде checkbox
-    inner_frame = Frame(first_windows,  bg="white", width=500, height=240, bd=2, relief=GROOVE)
-
-    # Создаем объект который имеет прокрутку
-    frame_in_canvas = ScrollBar(inner_frame)
+        # Создаем объект который имеет прокрутку
+        self.frame_in_canvas = ScrollBar(self.inner_frame)
     
-    global buttons
-    buttons = []
-    for name, url in list_item:
-        buttons.append(CheckButton(frame_in_canvas.frame_in_canvas, name, url))
+        self.buttons = []
+        # Создаем checkbuttons для каждого типа профессий
+        for name, url in self.list_item:
+            self.buttons.append(CheckButton(self.frame_in_canvas.frame_in_canvas, name, url))
     
 
-    # Кнопки "Все ВКЛ", "Все ОТКЛ"
-    buttons_on_off = Frame(first_windows)
-    Button(buttons_on_off, text="Все ВКЛ", padx=6, font="Calibri 11", relief=GROOVE, command=lambda: all_on_off("on")).pack(side=LEFT, padx=(25, 6))
-    Button(buttons_on_off, text="Все ВЫКЛ", padx=6, font="Calibri 11", relief=GROOVE, command=lambda: all_on_off("off")).pack(side=RIGHT)
+        # Кнопки "Все ВКЛ", "Все ОТКЛ"
+        self.buttons_on_off = Frame(self.first_windows)
+        Button(self.buttons_on_off, text="Все ВКЛ", padx=6, font="Calibri 11", relief=GROOVE, command=lambda: self.all_on_off("on")).pack(side=LEFT, padx=(25, 6))
+        Button(self.buttons_on_off, text="Все ВЫКЛ", padx=6, font="Calibri 11", relief=GROOVE, command=lambda: self.all_on_off("off")).pack(side=RIGHT)
+
+        # Кнопка Далее
+        self.but = Button(self.first_windows, text="Далее", padx=6, bd=2, relief=GROOVE, font="Calibri 11", command=self.next_page_button)
 
 
+        # Pack system
+        self.first_windows.pack(fill=BOTH, expand=1)
+        self.lab.pack(pady=(15,4), fill=X, padx=15)
+        self.inner_frame.pack()
+        self.inner_frame.pack_propagate(False)
+        self.buttons_on_off.pack(side=LEFT)
+        self.but.pack(padx=25, side=RIGHT)
 
-    # Кнопка Далее
-    but = Button(first_windows, text="Далее", padx=6, bd=2, relief=GROOVE, font="Calibri 11", command=lambda: next_page_button(first_windows, root))
+    def all_on_off(self, change):
+        if change == "on":
+            for ch in self.buttons:
+                ch.cb.select()
+        elif change == "off":
+            for ch in self.buttons:
+                ch.cb.deselect()
 
+    def next_page_button(self):
+        self.checked_buttons = []
 
-    # Pack system
-    first_windows.pack(fill=BOTH, expand=1)
-    lab.pack(pady=(15,4), fill=X, padx=15)
-    inner_frame.pack()
-    inner_frame.pack_propagate(False)
-    buttons_on_off.pack(side=LEFT)
-    but.pack(padx=25, side=RIGHT)
+        for ch in self.buttons:
+            if ch.var.get():
+                self.title_ = ch.title
+                self.url_ = str(ch.var.get())
 
+                self.checked_buttons.append((self.title_, self.url_))
 
-def second_page(checked_buttons, root):
-    main_frame = Frame(root)
-
-    lab_text = f"Вы выбрали {len(checked_buttons)} {ending_of_the_word(len(checked_buttons), ['профессию', 'профессии', 'профессий'])}"
-    lab = Label(main_frame, text=lab_text, font=("Calibri", 11), anchor=W)
-
-    frame_file_expansion = LabelFrame(main_frame, text="Выберите тип файла", pady=5)
-
-    file_expansion_val = StringVar()
-    file_expansion_val.set("xlsx")
-    def asshole():
-        if (file_expansion_val.get() == 'xlsx'):
-            pass
+        if self.checked_buttons:
+            self.first_windows.destroy()
+            SecondPage(self.checked_buttons, self.root)
         else:
-            pass
+            messagebox.showwarning("Ошибка!", "Вы не выбрали ни одну профессию\nПожалуйста выберите хотябы одну профессию")
 
-    xlsx_expansion = Radiobutton(frame_file_expansion,
-                                 text="В формате xlsx (Excel)",
-                                 value='xlsx',
-                                 variable=file_expansion_val,
-                                 cursor="hand2",
-                                 anchor=W, command=asshole
-                                 )
 
-    csv_expansion = Radiobutton(frame_file_expansion,
+class SecondPage:
+    def __init__(self,checked_buttons, root):
+        self.main_frame = Frame(root)
+        self.checked_buttons = checked_buttons
+        lab_text = f"Вы выбрали {len(self.checked_buttons)} {ending_of_the_word(len(self.checked_buttons), ['профессию', 'профессии', 'профессий'])}"
+        self.lab = Label(self.main_frame, text=lab_text, font=("Calibri", 11), anchor=W)
+
+        self.frame_file_expansion = LabelFrame(self.main_frame, text="Выберите тип файла", pady=5)
+
+        self.file_expansion_val = StringVar()
+        self.file_expansion_val.set("xlsx")
+
+
+        self.xlsx_expansion = Radiobutton(self.frame_file_expansion,
+                                    text="В формате xlsx (Excel)",
+                                    value='xlsx',
+                                    variable=self.file_expansion_val,
+                                    cursor="hand2",
+                                    anchor=W,
+                                    command=self.asshole
+                                    )
+
+        self.csv_expansion = Radiobutton(self.frame_file_expansion,
                                 text="В формате csv",
                                 value='csv',
-                                variable=file_expansion_val,
+                                variable=self.file_expansion_val,
                                 cursor="hand2",
-                                anchor=W, command=asshole
+                                anchor=W,
+                                command=self.asshole
                                 )
 
-    frame_select_place = LabelFrame(main_frame, text="Выберите место для сохранение файла")
-    selected_place = Entry(frame_select_place, width=60)
+        self.frame_select_place = LabelFrame(self.main_frame, text="Выберите место для сохранение файла")
+        self.selected_place = Entry(self.frame_select_place, width=58)
 
-    file_name = 'parsed_data'
-    file_expansion = file_expansion_val.get()
+        self.file_name = 'parsed_data'
+        self.file_expansion_val.get()
 
-    if os.name == 'nt':
-        selected_place.insert(0, os.path.dirname(__file__)+"\parsed_data."+file_expansion_val.get())
-    else:
-        selected_place.insert(0, os.path.dirname(__file__)+"/parsed_data."+file_expansion_val.get())
+        if os.name == 'nt':
+            self.selected_place.insert(0, os.path.dirname(__file__)+"\parsed_data."+self.file_expansion_val.get())
+            self.selected_place.config(state=DISABLED)
+        else:
+            self.selected_place.insert(0, os.path.dirname(__file__)+"/parsed_data."+self.file_expansion_val.get())
+            self.selected_place.config(state=DISABLED)
 
-    button_save_as = Button(frame_select_place,
-                            text="Сохранить как",
-                            command=lambda: select_place_to_save(frame_select_place, selected_place, file_name, file_expansion )
-                            )
+        self.button_save_as = Button(self.frame_select_place,
+                                    text="Сохранить как",
+                                    padx=6,
+                                    bd=2,
+                                    relief=GROOVE,
+                                    font="Calibri 10",
+                                    command=self.select_place_to_save,
+                                )
 
 
+        # Кнопка "скачать данных"
+        self.download_button = Button(self.main_frame,
+                                    text="Скачать данных",
+                                    padx=6,
+                                    bd=2,
+                                    relief=GROOVE,
+                                    font="Calibri 10",
+                                    command=self.download_data)
 
 
-    # Pack System
-    main_frame.pack(fill=BOTH, expand=1)
-    lab.pack(pady=(15,4), fill=X, padx=15)
+        # Pack System
+        self.main_frame.pack(fill=BOTH, expand=1)
+        self.lab.pack(pady=(15,4), fill=X, padx=15)
 
-    frame_file_expansion.pack(fill=X, padx=50)
-    xlsx_expansion.pack(fill=X, padx=15)
-    csv_expansion.pack(fill=X, padx=15)
+        self.frame_file_expansion.pack(fill=X, padx=50)
+        self.xlsx_expansion.pack(fill=X, padx=15)
+        self.csv_expansion.pack(fill=X, padx=15)
 
-    frame_select_place.pack(fill=X, padx=50, ipady=8, pady=25)
-    selected_place.pack(side=LEFT, fill=X, padx=(15,0))
-    button_save_as.pack(side=RIGHT, padx=15)
+        self.frame_select_place.pack(fill=X, padx=50, ipady=15, pady=25)
+        self.selected_place.pack(side=LEFT, fill=X, padx=(15,0))
+        self.button_save_as.pack(side=RIGHT, padx=15)
+
+        self.download_button.pack(side=RIGHT, padx=25, pady=(20, 0))
+
+    def asshole(self):
+        self.selected_place.config(state=NORMAL)
+
+        if self.file_expansion_val.get() == 'xlsx':
+            self.place = self.selected_place.get().replace('csv','xlsx')
+        elif self.file_expansion_val.get() == 'csv':
+            self.place = self.selected_place.get().replace('xlsx', 'csv')
+
+
+        self.selected_place.delete(0, END)
+        self.selected_place.insert(0, self.place)
+        self.selected_place.config(state=DISABLED)
+
+
+    def select_place_to_save(self):
+        s = filedialog.asksaveasfilename(title="Куда вы хотите сохранить файл",
+                                         initialfile=self.file_name,
+                                         defaultextension=self.file_expansion_val.get())
+
+        self.selected_place.config(state=NORMAL)
+        self.selected_place.delete(0, END)
+        self.selected_place.insert(0, s)
+        self.selected_place.config(state=DISABLED)
+
+    def download_data(self):
+        pass
