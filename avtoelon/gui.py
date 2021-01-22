@@ -2,6 +2,8 @@ from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
 import my_parser
+import os
+from tkinter import filedialog
 
 def ending_of_the_word(num: int, word: list):
     if 5 <= num < 21:
@@ -93,6 +95,13 @@ def next_page_button(first_window, root):
     else:
         messagebox.showwarning("Ошибка!", "Вы не выбрали ни одну профессию\nПожалуйста выберите хотябы одну профессию")
 
+def select_place_to_save(frame, input_area, file_name, file_expansion):
+    s = filedialog.asksaveasfilename(title="Куда вы хотите сохранить файл",
+                                     initialfile=file_name,
+                                     defaultextension=file_expansion)
+    print(s)
+
+
 
 def first_page(root):
     first_windows = Frame(root)
@@ -141,10 +150,61 @@ def second_page(checked_buttons, root):
     main_frame = Frame(root)
 
     lab_text = f"Вы выбрали {len(checked_buttons)} {ending_of_the_word(len(checked_buttons), ['профессию', 'профессии', 'профессий'])}"
-    lab = Label(main_frame, text=lab_text, font=("Calibri", 14, "bold"))
+    lab = Label(main_frame, text=lab_text, font=("Calibri", 11), anchor=W)
+
+    frame_file_expansion = LabelFrame(main_frame, text="Выберите тип файла", pady=5)
+
+    file_expansion_val = StringVar()
+    file_expansion_val.set("xlsx")
+    def asshole():
+        if (file_expansion_val.get() == 'xlsx'):
+            pass
+        else:
+            pass
+
+    xlsx_expansion = Radiobutton(frame_file_expansion,
+                                 text="В формате xlsx (Excel)",
+                                 value='xlsx',
+                                 variable=file_expansion_val,
+                                 cursor="hand2",
+                                 anchor=W, command=asshole
+                                 )
+
+    csv_expansion = Radiobutton(frame_file_expansion,
+                                text="В формате csv",
+                                value='csv',
+                                variable=file_expansion_val,
+                                cursor="hand2",
+                                anchor=W, command=asshole
+                                )
+
+    frame_select_place = LabelFrame(main_frame, text="Выберите место для сохранение файла")
+    selected_place = Entry(frame_select_place, width=60)
+
+    file_name = 'parsed_data'
+    file_expansion = file_expansion_val.get()
+
+    if os.name == 'nt':
+        selected_place.insert(0, os.path.dirname(__file__)+"\parsed_data."+file_expansion_val.get())
+    else:
+        selected_place.insert(0, os.path.dirname(__file__)+"/parsed_data."+file_expansion_val.get())
+
+    button_save_as = Button(frame_select_place,
+                            text="Сохранить как",
+                            command=lambda: select_place_to_save(frame_select_place, selected_place, file_name, file_expansion )
+                            )
+
+
+
 
     # Pack System
     main_frame.pack(fill=BOTH, expand=1)
-    lab.pack(pady=18)
+    lab.pack(pady=(15,4), fill=X, padx=15)
 
+    frame_file_expansion.pack(fill=X, padx=50)
+    xlsx_expansion.pack(fill=X, padx=15)
+    csv_expansion.pack(fill=X, padx=15)
 
+    frame_select_place.pack(fill=X, padx=50, ipady=8, pady=25)
+    selected_place.pack(side=LEFT, fill=X, padx=(15,0))
+    button_save_as.pack(side=RIGHT, padx=15)

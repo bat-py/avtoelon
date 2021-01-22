@@ -11,7 +11,6 @@ def get_html(url, params=None):
     page = requests.get(main_url+url, headers=HEADERS, params=params)
     return page
 
-
 # Скачивает ваканции из переданного каталога
 class GetItemsFromCatalog:
     def __init__(self, urls: list):
