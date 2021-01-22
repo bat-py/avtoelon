@@ -15,6 +15,16 @@ def ending_of_the_word(num: int, word: list):
     else:
         return word[2]
 
+class EnterLeave:
+    def __init__(self, enter_bg, leave_bg):
+        self.enter_bg = enter_bg
+        self.leave_bg = leave_bg
+
+    def enter(self, event):
+        event.widget['bg'] = self.enter_bg
+    def leave(self, event):
+        event.widget['bg'] = self.leave_bg
+
 
 class CheckButton:
     def __init__(self, master, title, url):
@@ -26,14 +36,9 @@ class CheckButton:
             onvalue=url, offvalue="", anchor=W,  bg="white")
         self.cb.pack(fill=X)
 
-        self.cb.bind('<Enter>', self.enter_func)                 # Запустит метод enter_func если мышка находится в этом виджете
-        self.cb.bind('<Leave>', self.leave_func)                 # Запустит leave_func как только мышка покинет зону виджета
-
-    def enter_func(self, event):
-            event.widget['bg'] = '#cdcdcd'
-
-    def leave_func(self, event):
-            event.widget['bg'] = 'white'
+        self.ass = EnterLeave('#cdcdcd', '#FFFFFF')
+        self.cb.bind('<Enter>', self.ass.enter)                 # Запустит метод enter_func если мышка находится в этом виджете
+        self.cb.bind('<Leave>', self.ass.leave)                 # Запустит leave_func как только мышка покинет зону виджета
 
 
 class ScrollBar:
@@ -97,11 +102,26 @@ class FirstPage:
 
         # Кнопки "Все ВКЛ", "Все ОТКЛ"
         self.buttons_on_off = Frame(self.first_windows)
-        Button(self.buttons_on_off, text="Все ВКЛ", padx=6, font="Calibri 11", relief=GROOVE, command=lambda: self.all_on_off("on")).pack(side=LEFT, padx=(25, 6))
-        Button(self.buttons_on_off, text="Все ВЫКЛ", padx=6, font="Calibri 11", relief=GROOVE, command=lambda: self.all_on_off("off")).pack(side=RIGHT)
+        self.turn_on_all = Button(self.buttons_on_off, text="Все ВКЛ", padx=6, font="Calibri 11", relief=GROOVE, command=lambda: self.all_on_off("on"))
+        self.turn_off_all = Button(self.buttons_on_off, text="Все ВЫКЛ", padx=6, font="Calibri 11", relief=GROOVE, command=lambda: self.all_on_off("off"))
+
+
+
 
         # Кнопка Далее
         self.but = Button(self.first_windows, text="Далее", padx=6, bd=2, relief=GROOVE, font="Calibri 11", command=self.next_page_button)
+
+
+        # Bind настройки
+        ent_leav_object = EnterLeave('#cdcdcd', '#f0f0f0')
+        self.turn_on_all.bind('<Enter>', ent_leav_object.enter)
+        self.turn_on_all.bind('<Leave>', ent_leav_object.leave)
+
+        self.turn_off_all.bind('<Enter>', ent_leav_object.enter)
+        self.turn_off_all.bind('<Leave>', ent_leav_object.leave)
+
+        self.but.bind('<Enter>', ent_leav_object.enter)
+        self.but.bind('<Leave>', ent_leav_object.leave)
 
 
         # Pack system
@@ -110,6 +130,8 @@ class FirstPage:
         self.inner_frame.pack()
         self.inner_frame.pack_propagate(False)
         self.buttons_on_off.pack(side=LEFT)
+        self.turn_on_all.pack(side=LEFT, padx=(25, 6))
+        self.turn_off_all.pack(side=RIGHT)
         self.but.pack(padx=25, side=RIGHT)
 
     def all_on_off(self, change):
@@ -199,6 +221,12 @@ class SecondPage:
                                     relief=GROOVE,
                                     font="Calibri 10",
                                     command=self.download_data)
+
+
+        # Bind настройки
+        ent_leav_object = EnterLeave('#cdcdcd', '#f0f0f0')
+        self.download_button.bind('<Enter>', ent_leav_object.enter)
+        self.download_button.bind('<Leave>', ent_leav_object.leave)
 
 
         # Pack System
