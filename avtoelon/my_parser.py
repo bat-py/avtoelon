@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup 
 import requests
 
+
 def get_html(url, params=None):
     HEADERS = {
         'user-agent' : 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:76.0) Gecko/20100101 Firefox/76.0',
@@ -13,30 +14,43 @@ def get_html(url, params=None):
 
 # Скачивает ваканции из переданного каталога
 class GetItemsFromCatalog:
-    def __init__(self, urls: list):
+    def __init__(self, urls: list, messagebox, root):
+        self.root = root
         self.title = urls[0]
         self.url = urls[1]
         self.request_status = 1
         self.list_vacancies = []                         # тут хранится все ваканции
+        self.error_text = "Ошибка", "Загрузка прервана\nПожалуйста проверьте подключение к интернету"
 
         self.get_number_of_pages()
         self.get_all_vacancies_from_page()
 
     def get_number_of_pages(self):
-        html = get_html(self.url)
+        try:
+            html = get_html(self.url)
+        except:
+            self.messagebox.showerror(*self.error_text)
+            self.root.destroy()
+
 
         if html.status_code == 200:
             soup = BeautifulSoup(html.text, "html.parser")
             bloko_button = soup.find_all("a", class_="bloko-button HH-Pager-Control")
 
             pages = [0]
-            for page_num in bloko_button:
-                date_page = page_num.get("data-page")
-                pages.append(int(date_page))
+
+            try:
+                for page_num in bloko_button:
+                    date_page = page_num.get("data-page")
+                    pages.append(int(date_page))
+            except:
+                pass
 
             self.number_of_pages = max(pages)
         else:
-            self.request_status = 0
+            self.messagebox.showerror(*self.error_text)
+            self.root.destroy()
+            return 0
 
     def get_all_vacancies_from_page(self):
         if self.request_status:
@@ -46,7 +60,12 @@ class GetItemsFromCatalog:
                     self.list_vacancies.extend(vacancies_from_page)
 
     def get_items_from_one_page(self, page_num):
-        html = get_html(self.url, params={"page":page_num})
+        try:
+            html = get_html(self.url, params={"page":page_num})
+        except:
+            self.messagebox.showerror(*self.error_text)
+            self.root.destroy()
+
 
         if html.status_code == 200:
             soup = BeautifulSoup(html.text, "html.parser")
@@ -87,11 +106,18 @@ class GetItemsFromCatalog:
             return items
         else:
             self.request_status = 0
-            return 0
+            self.messagebox.showerror(*self.error_text)
+            self.root.destroy()
+
+
 
 # Вернет список работ по профессиям c ссылками
-def list_jobs():
-    html = get_html("/catalog")
+def list_jobs(root, messagebox):
+    try:
+        html = get_html("/catalog")
+    except:
+        messagebox.showerror("Ошибка", "Загрузка прервана\nПожалуйста проверьте подключение к интернету")
+        root.destroy()
 
     if html.status_code == 200:
         soup = BeautifulSoup(html.text, "html.parser")
@@ -106,6 +132,8 @@ def list_jobs():
     
         return dic_item 
     else:
+        messagebox.showerror("Ошибка", "Загрузка прервана\nПожалуйста проверьте подключение к интернету")
+        root.destroy()
         return 0
 
 

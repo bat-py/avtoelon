@@ -85,7 +85,7 @@ class FirstPage:
         self.lab.config(font=("Calibri", 11))
 
         # Получаем список профессий
-        self.dic_item = my_parser.list_jobs()
+        self.dic_item = my_parser.list_jobs(self.root, messagebox)
         self.list_item = self.dic_item.items()
 
         # В этом фрэйме будет список профессий чтобы в виде checkbox
@@ -156,11 +156,12 @@ class FirstPage:
             self.first_windows.destroy()
             SecondPage(self.checked_buttons, self.root)
         else:
-            messagebox.showwarning("Ошибка!", "Вы не выбрали ни одну профессию\nПожалуйста выберите хотябы одну профессию")
+            messagebox.showerror("Ошибка!", "Вы не выбрали ни одну профессию\nПожалуйста выберите хотябы одну профессию")
 
 
 class SecondPage:
     def __init__(self,checked_buttons, root):
+        self.root = root
         self.main_frame = Frame(root)
         self.checked_buttons = checked_buttons
         lab_text = f"Вы выбрали {len(self.checked_buttons)} {ending_of_the_word(len(self.checked_buttons), ['профессию', 'профессии', 'профессий'])}"
@@ -273,6 +274,51 @@ class SecondPage:
             else:
                 self.selected_place = os.path.dirname(__file__) + "/parsed_data." + self.file_expansion_val.get()
 
+        self.main_frame.destroy()
+
+        #Запускаем 3 страницу
+        ThirdPage(self.root, self.checked_buttons)
+
+
+class ThirdPage:
+    def __init__(self, root, checked_buttons):
+        self.root = root
+        self.checked_buttons = checked_buttons
+        self.main_frame = Frame(self.root)
+        info = Label(self.main_frame, text="Идет загрузка данных", anchor=W)
+
+        # После того как полностью загрузится один каталог, в progressbar_value добовляется этот процент
+        self.plus_value = int(100/len(self.checked_buttons))
+        self.progressbar_value = 0
+
+
+        self.progressbar = ttk.Progressbar(self.main_frame,
+                                           orient=HORIZONTAL,
+                                           length=450,
+                                           mode='determinate',
+                                           maximum=100)
+
+        self.progressbar_percent = Label(self.main_frame, text=self.progressbar_value)
+
+        # Pack system
+        self.main_frame.pack(fill=BOTH, expand=1)
+        info.pack(fill=X)
+        self.progressbar.pack(side=LEFT)
+        self.progressbar_percent.pack(side=RIGHT)
+
+        self._progressbar()
+
+
+    def _progressbar(self):
         self.parsed_data = []
+
+
         for button_item in self.checked_buttons:
-            self.parsed_data.append(my_parser.GetItemsFromCatalog(button_item))
+            self.parsed_data.append(my_parser.GetItemsFromCatalog(button_item, messagebox, self.root))
+
+            if button_item is self.checked_buttons[-1]:
+                self.progressbar["value"] = 100
+                messagebox.showinfo(title="Загрузка завершена успешно")
+                self.root.destroy()
+
+            self.progressbar_value += self.plus_value
