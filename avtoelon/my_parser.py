@@ -80,10 +80,13 @@ class GetItemsFromCatalog:
 
                 wage = item.find("span", class_="bloko-section-header-3 bloko-section-header-3_lite").get_text()
 
-                employer_block = item.find("div", class_="vacancy-serp-item__meta-info-company")\
-                    .find("a", class_="bloko-link bloko-link_secondary")
-                employer = employer_block.get_text()
-                employer_href = employer_block.get("href")
+                try:
+                    employer_block = item.find("a", class_="bloko-link bloko-link_secondary")
+                    employer = employer_block.get_text()
+                    employer_href = employer_block.get("href")
+                except:
+                    employer = ''
+                    employer_href = ''
 
                 city = item.find("span", class_="vacancy-serp-item__meta-info").get_text()
 

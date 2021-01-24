@@ -285,7 +285,7 @@ class ThirdPage:
         self.root = root
         self.checked_buttons = checked_buttons
         self.main_frame = Frame(self.root)
-        info = Label(self.main_frame, text="Идет загрузка данных", anchor=W)
+        info = Label(self.main_frame, text="Идет загрузка данных", anchor=W, font=("Calibri", 11))
 
         # После того как полностью загрузится один каталог, в progressbar_value добовляется этот процент
         self.plus_value = int(100/len(self.checked_buttons))
@@ -298,13 +298,13 @@ class ThirdPage:
                                            mode='determinate',
                                            maximum=100)
 
-        self.progressbar_percent = Label(self.main_frame, text=self.progressbar_value)
+        self.progressbar_percent = Label(self.main_frame, text=self.progressbar_value, anchor=W)
 
         # Pack system
         self.main_frame.pack(fill=BOTH, expand=1)
-        info.pack(fill=X)
-        self.progressbar.pack(side=LEFT)
-        self.progressbar_percent.pack(side=RIGHT)
+        info.pack(fill=X, padx=15, pady=(15, 4))
+        self.progressbar.pack(side=LEFT, padx=15)
+        self.progressbar_percent.pack(side=RIGHT, padx=5)
 
         self._progressbar()
 
@@ -322,3 +322,4 @@ class ThirdPage:
                 self.root.destroy()
 
             self.progressbar_value += self.plus_value
+            self.progressbar["value"] = self.progressbar_value
