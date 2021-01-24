@@ -283,43 +283,71 @@ class SecondPage:
 class ThirdPage:
     def __init__(self, root, checked_buttons):
         self.root = root
-        self.checked_buttons = checked_buttons
         self.main_frame = Frame(self.root)
-        info = Label(self.main_frame, text="Идет загрузка данных", anchor=W, font=("Calibri", 11))
-
+        info = Label(self.main_frame,
+                     text="Идет загрузка данных", 
+                     anchor=W, 
+                     font=("Calibri", 11))
+        
+        self.checked_buttons = checked_buttons
+        # Тут хранится порядковый номер, чтобы при рекурсивном вызове progress можно было определить где остановился последный раз
+        self.checked_buttons_queue = 0
+        # Тут хранится экземпляры, и каждый экземпляр хранит в себе данных одного каталога
+        self.parsed_data = []
         # После того как полностью загрузится один каталог, в progressbar_value добовляется этот процент
         self.plus_value = int(100/len(self.checked_buttons))
+        # Тут хранится на сколько процентов загружено данные
         self.progressbar_value = 0
 
 
         self.progressbar = ttk.Progressbar(self.main_frame,
                                            orient=HORIZONTAL,
-                                           length=450,
+                                           length=300,
                                            mode='determinate',
                                            maximum=100)
+        
+        self.progressbar_percent = Label(self.main_frame, 
+                                         text=f"{self.progressbar_value}%", 
+                                         anchor=W)
+        
+        
+        # Pack System
+        self.main_frame.pack()
+        info.pack(padx=15, pady=(15, 4))
+        self.progressbar.pack(side=LEFT)
+        self.progressbar_percent.pack(side=RIGHT)
+        
+        self.progress()
 
-        self.progressbar_percent = Label(self.main_frame, text=self.progressbar_value, anchor=W)
+        
+    def progress(self):
+        datas_from_one_catalog = my_parser.GetItemsFromCatalog(self.checked_buttons[self.checked_buttons_queue],
+                                                                   messagebox, 
+                                                                   self.root)        # Мы передаем ей root, это чтобы если будут проблемы с интернетом, то класс GetItemsFromCatalog сам будет закрывать окно
+        self.parsed_data.append(datas_from_one_catalog)
 
-        # Pack system
-        self.main_frame.pack(fill=BOTH, expand=1)
-        info.pack(fill=X, padx=15, pady=(15, 4))
-        self.progressbar.pack(side=LEFT, padx=15)
-        self.progressbar_percent.pack(side=RIGHT, padx=5)
+        if self.checked_buttons[self.checked_buttons_queue] is self.checked_buttons[-1]:
+            self.progressbar["value"] = 100
+            self.progressbar_percent["text"] = "100%"
+            self.stop()
 
-        self._progressbar()
+        self.checked_buttons_queue += 1
+        self.progressbar_value += self.plus_value 
+        self.progressbar["value"] = self.progressbar_value
+        self.progressbar_percent["text"] = f"{self.progressbar_value}%"
+            
+        self.root.after(100, self.progress)
+
+    def stop(self):
+        messagebox.showinfo("Загрузка закончена", "Данные сохранены успешно" )
+        self.root.destroy()
+            
 
 
-    def _progressbar(self):
-        self.parsed_data = []
 
 
-        for button_item in self.checked_buttons:
-            self.parsed_data.append(my_parser.GetItemsFromCatalog(button_item, messagebox, self.root))
 
-            if button_item is self.checked_buttons[-1]:
-                self.progressbar["value"] = 100
-                messagebox.showinfo(title="Загрузка завершена успешно")
-                self.root.destroy()
 
-            self.progressbar_value += self.plus_value
-            self.progressbar["value"] = self.progressbar_value
+
+
+
