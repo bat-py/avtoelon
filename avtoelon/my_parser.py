@@ -78,33 +78,42 @@ class GetItemsFromCatalog:
                 name = i.get_text()
                 href = i.get("href")
 
-                wage = item.find("span", class_="bloko-section-header-3 bloko-section-header-3_lite").get_text()
+                wage = item.find_next("div", class_="vacancy-serp-item__sidebar").get_text()
 
                 try:
                     employer_block = item.find("a", class_="bloko-link bloko-link_secondary")
                     employer = employer_block.get_text()
-                    employer_href = employer_block.get("href")
+                    employer_href = "https://tashkent.hh.uz"+employer_block.get("href")
                 except:
                     employer = ''
                     employer_href = ''
 
                 city = item.find("span", class_="vacancy-serp-item__meta-info").get_text()
 
-                vacancy_responsibility_requirement = []
                 about_vacancy = item.find("div", class_="g-user-content").find_all("div")
+
+                vrr = 1
                 for i in about_vacancy:
-                    vacancy_responsibility_requirement.append(i.get_text())
+                    if vrr:
+                        vacancy_responsibility = i.get_text()
+                        vrr = 0
+                    else:
+                        vacancy_requirement = i.get_text()
+
 
                 date = item.find("span", class_="vacancy-serp-item__publication-date").get_text()
 
                 items.append({"item_name": name,
-                              "item_href": href,
+
                               "wage": wage,
-                              "employer": employer,
-                              "employer_href": employer_href,
                               "city": city,
-                              "vacancy_responsibility": vacancy_responsibility_requirement,
-                              "date": date})
+                              "date": date,
+                              "employer": employer,
+                              "vacancy_responsibility": vacancy_responsibility,
+                              "vacancy_requirement" : vacancy_requirement,
+                              "item_href": href,
+                              "employer_href": employer_href
+                              })
 
             return items
         else:

@@ -273,10 +273,12 @@ class SecondPage:
             else:
                 self.selected_place = os.path.dirname(__file__) + "/parsed_data." + self.file_expansion_val.get()
 
+        self.selected_place.config(state=NORMAL)
+        expansion = self.file_expansion_val.get()
+        place = self.selected_place.get()
         self.main_frame.destroy()
-
         #Запускаем 3 страницу
-        ThirdPage(self.root, self.checked_buttons, self.file_expansion_val.get(), self.selected_place)
+        ThirdPage(self.root, self.checked_buttons,expansion, place)
 
 
 class ThirdPage:
@@ -300,23 +302,26 @@ class ThirdPage:
         # Тут хранится на сколько процентов загружено данные
         self.progressbar_value = 0
 
-        self.progressbar = ttk.Progressbar(self.main_frame,
+        self.progressbar_frame = Frame(self.main_frame)
+        self.progressbar = ttk.Progressbar(self.progressbar_frame,
                                            orient=HORIZONTAL,
-                                           length=300,
+                                           length=450,
                                            mode='determinate',
                                            maximum=100,
-                                           value=0)
+                                           value=0
+                                           )
         
-        self.progressbar_percent = Label(self.main_frame, 
+        self.progressbar_percent = Label(self.progressbar_frame,
                                          text=f"{self.progressbar_value}%", 
                                          anchor=W)
         
         
         # Pack System
-        self.main_frame.pack()
-        info.pack(padx=15, pady=(15, 4))
-        self.progressbar.pack(side=LEFT)
-        self.progressbar_percent.pack(side=RIGHT)
+        self.main_frame.pack(fill=BOTH)
+        info.pack(padx=15, pady=(15, 4), fill=X)
+        self.progressbar_frame.pack()
+        self.progressbar.grid(row=0, column=0)
+        self.progressbar_percent.grid(row=0, column=1)
          
         self.root.after(10, self.progress)
 
@@ -331,6 +336,7 @@ class ThirdPage:
             self.progressbar["value"] = 100
             self.progressbar_percent["text"] = "100%"
             self.writer_to_file()
+            return 0
 
         self.checked_buttons_queue += 1
         self.progressbar_value += self.plus_value 
@@ -340,11 +346,11 @@ class ThirdPage:
         self.root.after(100, self.progress)
     
     def writer_to_file(self):
-        with open(self.selected_place, 'w') as w:
             if self.file_expansion_val == 'csv':
-                writer.CsvWriter(w, self.parsed_data)
+                writer.CsvWriter(self.selected_place, self.parsed_data, self.stop)
             else:
-                writer.ExcelWriter(w, self.parsed_data)
+                writer.ExcelWriter(self.selected_place, self.parsed_data, self.stop)
+
 
 
     def stop(self):
