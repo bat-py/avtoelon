@@ -4,7 +4,7 @@ from tkinter import messagebox
 import my_parser
 import os
 from tkinter import filedialog
-
+import writer 
 def ending_of_the_word(num: int, word: list):
     if 5 <= num < 21:
         return word[2]
@@ -195,7 +195,6 @@ class SecondPage:
         self.selected_place = Entry(self.frame_select_place, width=58)
 
         self.file_name = 'parsed_data'
-        self.file_expansion_val.get()
 
         if os.name == 'nt':
             self.selected_place.insert(0, os.path.dirname(__file__)+"\parsed_data."+self.file_expansion_val.get())
@@ -277,11 +276,11 @@ class SecondPage:
         self.main_frame.destroy()
 
         #Запускаем 3 страницу
-        ThirdPage(self.root, self.checked_buttons)
+        ThirdPage(self.root, self.checked_buttons, self.file_expansion_val.get(), self.selected_place)
 
 
 class ThirdPage:
-    def __init__(self, root, checked_buttons):
+    def __init__(self, root, checked_buttons, file_expansion_val, selected_place):
         self.root = root
         self.main_frame = Frame(self.root)
         info = Label(self.main_frame,
@@ -289,6 +288,8 @@ class ThirdPage:
                      anchor=W, 
                      font=("Calibri", 11))
         
+        self.file_expansion_val = file_expansion_val
+        self.selected_place = selected_place 
         self.checked_buttons = checked_buttons
         # Тут хранится порядковый номер, чтобы при рекурсивном вызове progress можно было определить где остановился последный раз
         self.checked_buttons_queue = 0
@@ -299,12 +300,12 @@ class ThirdPage:
         # Тут хранится на сколько процентов загружено данные
         self.progressbar_value = 0
 
-
         self.progressbar = ttk.Progressbar(self.main_frame,
                                            orient=HORIZONTAL,
                                            length=300,
                                            mode='determinate',
-                                           maximum=100)
+                                           maximum=100,
+                                           value=0)
         
         self.progressbar_percent = Label(self.main_frame, 
                                          text=f"{self.progressbar_value}%", 
@@ -316,8 +317,8 @@ class ThirdPage:
         info.pack(padx=15, pady=(15, 4))
         self.progressbar.pack(side=LEFT)
         self.progressbar_percent.pack(side=RIGHT)
-        
-        self.progress()
+         
+        self.root.after(10, self.progress)
 
         
     def progress(self):
@@ -329,7 +330,7 @@ class ThirdPage:
         if self.checked_buttons[self.checked_buttons_queue] is self.checked_buttons[-1]:
             self.progressbar["value"] = 100
             self.progressbar_percent["text"] = "100%"
-            self.stop()
+            self.writer_to_file()
 
         self.checked_buttons_queue += 1
         self.progressbar_value += self.plus_value 
@@ -337,6 +338,14 @@ class ThirdPage:
         self.progressbar_percent["text"] = f"{self.progressbar_value}%"
             
         self.root.after(100, self.progress)
+    
+    def writer_to_file(self):
+        with open(self.selected_place, 'w') as w:
+            if self.file_expansion_val == 'csv':
+                writer.CsvWriter(w, self.parsed_data)
+            else:
+                writer.ExcelWriter(w, self.parsed_data)
+
 
     def stop(self):
         messagebox.showinfo("Загрузка закончена", "Данные сохранены успешно" )
