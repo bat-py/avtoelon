@@ -64,11 +64,20 @@ class CsvWriter:
         self.writer()
 
     def writer(self):
-        fieldnames = ['Заголовок', 'Ссылка на объявление', 'Зарплата', 'Город', 'Дата', 'Работодатель', 'Ссылка работодателя', 'Обязанность', 'Требования']
+        fieldnames_ru = {'item_name':'Заголовок',
+                         'wage' : 'Зарплата',
+                         'city' : 'Город',
+                         'date' : 'Дата',
+                         'employer' : 'Работодатель',
+                         'vacancy_responsibility' : 'Обязанность',
+                         'vacancy_requirement' : 'Требования',
+                         'item_href' : 'Ссылка на объявление',
+                         'employer_href' : 'Ссылка работодателя'}
 
+        fieldnames_en = []
         first_line = 1
         for i in self.parsed_data[0].list_vacancies[0].items():
-            fieldnames.append(i[0])
+            fieldnames_en.append(i[0])
 
         with open(self.selected_place, 'w', encoding='utf-16', newline='') as w:
             for i in self.parsed_data:
@@ -77,9 +86,8 @@ class CsvWriter:
                 first_line = 0
 
                 w.write(i.title+'\n')
-                cursor = csv.DictWriter(w, fieldnames=fieldnames)
-                cursor.writeheader()
-
+                cursor = csv.DictWriter(w, fieldnames=fieldnames_en)
+                cursor.writerow(fieldnames_ru)
                 cursor.writerows(i.list_vacancies)
 
         self.stop()

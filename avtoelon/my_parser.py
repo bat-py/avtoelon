@@ -104,7 +104,6 @@ class GetItemsFromCatalog:
                 date = item.find("span", class_="vacancy-serp-item__publication-date").get_text()
 
                 items.append({"item_name": name,
-
                               "wage": wage,
                               "city": city,
                               "date": date,
