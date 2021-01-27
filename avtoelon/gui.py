@@ -5,25 +5,17 @@ import my_parser
 import os
 from tkinter import filedialog
 import writer 
+
 def ending_of_the_word(num: int, word: list):
     if 5 <= num < 21:
         return word[2]
     elif num%10 == 1:
-        return word[0]
+       return word[0]
     elif 1 < num%10 < 5:
         return word[1]
     else:
         return word[2]
 
-class EnterLeave:
-    def __init__(self, enter_bg, leave_bg):
-        self.enter_bg = enter_bg
-        self.leave_bg = leave_bg
-
-    def enter(self, event):
-        event.widget['bg'] = self.enter_bg
-    def leave(self, event):
-        event.widget['bg'] = self.leave_bg
 
 
 class CheckButton:
@@ -31,14 +23,11 @@ class CheckButton:
         self.var = StringVar()
         self.var.set("")
         self.title = title
-        self.cb = Checkbutton(
+        self.cb = ttk.Checkbutton(
             master, text=self.title, variable=self.var,
-            onvalue=url, offvalue="", anchor=W,  bg="white")
+            onvalue=url, offvalue="")
         self.cb.pack(fill=X)
 
-        self.ass = EnterLeave('#cdcdcd', '#FFFFFF')
-        self.cb.bind('<Enter>', self.ass.enter)                 # Запустит метод enter_func если мышка находится в этом виджете
-        self.cb.bind('<Leave>', self.ass.leave)                 # Запустит leave_func как только мышка покинет зону виджета
 
 
 class ScrollBar:
@@ -81,7 +70,7 @@ class FirstPage:
         self.root = root
         self.first_windows = Frame(self.root)
 
-        self.lab = Label(self.first_windows, text='Пожалуйста выберите нужные вам профессии', anchor=W )
+        self.lab = ttk.Label(self.first_windows, text='Пожалуйста выберите нужные вам профессии', anchor=W )
         self.lab.config(font=("Calibri", 11))
 
         # Получаем список профессий
@@ -89,7 +78,7 @@ class FirstPage:
         self.list_item = self.dic_item.items()
 
         # В этом фрэйме будет список профессий чтобы в виде checkbox
-        self.inner_frame = Frame(self.first_windows,  bg="white", width=500, height=240, bd=2, relief=GROOVE)
+        self.inner_frame = Frame(self.first_windows, bg="white", width=500, height=240, bd=2, relief=GROOVE)
 
         # Создаем объект который имеет прокрутку
         self.frame_in_canvas = ScrollBar(self.inner_frame)
@@ -101,32 +90,21 @@ class FirstPage:
     
 
         # Кнопки "Все ВКЛ", "Все ОТКЛ"
-        self.buttons_on_off = Frame(self.first_windows)
-        self.turn_on_all = Button(self.buttons_on_off, text="Все ВКЛ", padx=6, font="Calibri 11", relief=GROOVE, command=lambda: self.all_on_off("on"))
-        self.turn_off_all = Button(self.buttons_on_off, text="Все ВЫКЛ", padx=6, font="Calibri 11", relief=GROOVE, command=lambda: self.all_on_off("off"))
+        self.buttons_on_off = ttk.Frame(self.first_windows)
+        self.turn_on_all = ttk.Button(self.buttons_on_off, text="Все ВКЛ", command=lambda: self.all_on_off("on"))
+        self.turn_off_all = ttk.Button(self.buttons_on_off, text="Все ВЫКЛ", command=lambda: self.all_on_off("off"))
 
 
 
 
         # Кнопка Далее
-        self.but = Button(self.first_windows, text="Далее", padx=6, bd=2, relief=GROOVE, font="Calibri 11", command=self.next_page_button)
+        self.but = ttk.Button(self.first_windows, text="Далее", command=self.next_page_button)
 
-
-        # Bind настройки
-        ent_leav_object = EnterLeave('#cdcdcd', '#f0f0f0')
-        self.turn_on_all.bind('<Enter>', ent_leav_object.enter)
-        self.turn_on_all.bind('<Leave>', ent_leav_object.leave)
-
-        self.turn_off_all.bind('<Enter>', ent_leav_object.enter)
-        self.turn_off_all.bind('<Leave>', ent_leav_object.leave)
-
-        self.but.bind('<Enter>', ent_leav_object.enter)
-        self.but.bind('<Leave>', ent_leav_object.leave)
 
 
         # Pack system
         self.first_windows.pack(fill=BOTH, expand=1)
-        self.lab.pack(pady=(15,4), fill=X, padx=15)
+        self.lab.pack(pady=(15,6), fill=X, padx=15)
         self.inner_frame.pack()
         self.inner_frame.pack_propagate(False)
         self.buttons_on_off.pack(side=LEFT)
@@ -156,7 +134,7 @@ class FirstPage:
             self.first_windows.destroy()
             SecondPage(self.checked_buttons, self.root)
         else:
-            messagebox.showerror("Ошибка!", "Вы не выбрали ни одну профессию\nПожалуйста выберите хотябы одну профессию")
+            ttk.messagebox.showerror("Ошибка!", "Вы не выбрали ни одну профессию\nПожалуйста выберите хотябы одну профессию")
 
 
 class SecondPage:
@@ -165,34 +143,31 @@ class SecondPage:
         self.main_frame = Frame(root)
         self.checked_buttons = checked_buttons
         lab_text = f"Вы выбрали {len(self.checked_buttons)} {ending_of_the_word(len(self.checked_buttons), ['профессию', 'профессии', 'профессий'])}"
-        self.lab = Label(self.main_frame, text=lab_text, font=("Calibri", 11), anchor=W)
+        self.lab = ttk.Label(self.main_frame, text=lab_text, anchor=W)
 
-        self.frame_file_expansion = LabelFrame(self.main_frame, text="Выберите тип файла", pady=5)
+        self.frame_file_expansion = ttk.LabelFrame(self.main_frame, text="Выберите тип файла")
 
         self.file_expansion_val = StringVar()
         self.file_expansion_val.set("xlsx")
 
-
-        self.xlsx_expansion = Radiobutton(self.frame_file_expansion,
+        self.xlsx_expansion = ttk.Radiobutton(self.frame_file_expansion,
                                     text="В формате xlsx (Excel)",
                                     value='xlsx',
                                     variable=self.file_expansion_val,
                                     cursor="hand2",
-                                    anchor=W,
-                                    command=self.asshole
+                                    command=self.asshole,
                                     )
 
-        self.csv_expansion = Radiobutton(self.frame_file_expansion,
+        self.csv_expansion = ttk.Radiobutton(self.frame_file_expansion,
                                 text="В формате csv",
                                 value='csv',
                                 variable=self.file_expansion_val,
                                 cursor="hand2",
-                                anchor=W,
                                 command=self.asshole
                                 )
 
-        self.frame_select_place = LabelFrame(self.main_frame, text="Выберите место для сохранение файла")
-        self.selected_place = Entry(self.frame_select_place, width=58)
+        self.frame_select_place = ttk.LabelFrame(self.main_frame, text="Выберите место для сохранение файла")
+        self.selected_place = ttk.Entry(self.frame_select_place, width=58)
 
         self.file_name = 'parsed_data'
 
@@ -203,37 +178,25 @@ class SecondPage:
             self.selected_place.insert(0, os.path.dirname(__file__)+"/parsed_data."+self.file_expansion_val.get())
             self.selected_place.config(state=DISABLED)
 
-        self.button_save_as = Button(self.frame_select_place,
+        self.button_save_as = ttk.Button(self.frame_select_place,
                                     text="Сохранить как",
-                                    padx=6,
-                                    bd=2,
-                                    relief=GROOVE,
-                                    font="Calibri 10",
                                     command=self.select_place_to_save,
                                 )
 
 
         # Кнопка "скачать данных"
-        self.download_button = Button(self.main_frame,
+        self.download_button = ttk.Button(self.main_frame,
                                     text="Скачать данных",
-                                    padx=6,
-                                    bd=2,
-                                    relief=GROOVE,
-                                    font="Calibri 10",
                                     command=self.download_data)
 
 
-        # Bind настройки
-        ent_leav_object = EnterLeave('#cdcdcd', '#f0f0f0')
-        self.download_button.bind('<Enter>', ent_leav_object.enter)
-        self.download_button.bind('<Leave>', ent_leav_object.leave)
 
 
         # Pack System
         self.main_frame.pack(fill=BOTH, expand=1)
         self.lab.pack(pady=(15,4), fill=X, padx=15)
 
-        self.frame_file_expansion.pack(fill=X, padx=50)
+        self.frame_file_expansion.pack(fill=X, padx=50, ipady=5)
         self.xlsx_expansion.pack(fill=X, padx=15)
         self.csv_expansion.pack(fill=X, padx=15)
 
@@ -285,10 +248,9 @@ class ThirdPage:
     def __init__(self, root, checked_buttons, file_expansion_val, selected_place):
         self.root = root
         self.main_frame = Frame(self.root)
-        info = Label(self.main_frame,
+        info = ttk.Label(self.main_frame,
                      text="Идет загрузка данных", 
-                     anchor=W, 
-                     font=("Calibri", 11))
+                    )
         
         self.file_expansion_val = file_expansion_val
         self.selected_place = selected_place 
@@ -311,7 +273,7 @@ class ThirdPage:
                                            value=0
                                            )
         
-        self.progressbar_percent = Label(self.progressbar_frame,
+        self.progressbar_percent = ttk.Label(self.progressbar_frame,
                                          text=f"{self.progressbar_value}%", 
                                          anchor=W)
         
@@ -354,7 +316,7 @@ class ThirdPage:
 
 
     def stop(self):
-        messagebox.showinfo("Загрузка закончена", "Данные сохранены успешно" )
+        ttk.messagebox.showinfo("Загрузка закончена", "Данные сохранены успешно" )
         self.root.destroy()
             
 

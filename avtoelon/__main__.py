@@ -1,17 +1,24 @@
-from tkinter import * 
+import tkinter as tk
 import gui
+from ttkthemes import ThemedStyle
 
+class Root(tk.Tk):
+    def __init__(self):
+        tk.Tk.__init__(self)
+        
+        self.title("Парсер сайта tashkent.hh.uz")
+        self.geometry('600x400')
+        self.resizable(width=False, height=False)
 
+        style = ThemedStyle(self)
+        style.set_theme('breeze')
 
-root = Tk()
-root.title("Парсер сайта tashkent.hh.uz")
-root.geometry('600x400')
-root.resizable(width=False, height=False)
+        top_menu = tk.Frame(self, bg="white", height=65)
+        top_menu.pack(fill=tk.X)
+        top_menu.pack_propagate(False)
 
-top_menu = Frame(root, bg="white", height=65)
-top_menu.pack(fill=X)
-top_menu.pack_propagate(False)
+        gui.FirstPage(self)
 
-gui.FirstPage(root)
+        self.mainloop()
 
-root.mainloop()
+Root()
