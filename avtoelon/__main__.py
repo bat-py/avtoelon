@@ -19,19 +19,23 @@ class Root(tk.Tk):
         style = ThemedStyle(self)
         style.set_theme('breeze')
 
-        self.top_menu = tk.Frame(self)
-        self.top_menu.pack()
+        self.top_menu = tk.Frame(self, bg="white", height=65, pady=5)
+        self.top_menu.pack(fill=tk.X)
+        self.top_menu.pack_propagate(False)
 
-        imag = tk.PhotoImage(file='hh.png')
-        lab = tk.Label(self, image=imag)
-        lab.pack()
+        
+        my_image = Image.open('images/hh.png')
+        my_image = my_image.resize((53, 53), Image.ANTIALIAS)
+
+        image = ImageTk.PhotoImage(my_image)
+        
+        image_lab = tk.Label(self.top_menu, image=image)
+        image_lab.pack(side=tk.LEFT, padx=5)
+
  
         gui.FirstPage(self)
 
 
-#        my_image = ImageTk.PhotoImage(Image.open('./images/hh.png'))
-#        image_lab = tk.Label(self.top_menu, image=my_image)
-#        image_lab.pack()
 
         self.mainloop()
 Root()
