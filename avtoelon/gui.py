@@ -23,6 +23,7 @@ class CheckButton:
         self.var = StringVar()
         self.var.set("")
         self.title = title
+
         self.cb = ttk.Checkbutton(
             master, text=self.title, variable=self.var,
             onvalue=url, offvalue="")
@@ -47,7 +48,7 @@ class ScrollBar:
         self.my_canvas.bind_all("<MouseWheel>", self.on_mousewheel)
 
         # Create Another Frame INSIDE the canvas
-        self.frame_in_canvas  = Frame(self.my_canvas)
+        self.frame_in_canvas  = ttk.Frame(self.my_canvas)
 
         # Add that New Frame to a Window in the canvas
         self.my_canvas.create_window((0,0), window=self.frame_in_canvas, anchor="nw", tags="my_tag")
@@ -82,7 +83,7 @@ class FirstPage:
 
         # Создаем объект который имеет прокрутку
         self.frame_in_canvas = ScrollBar(self.inner_frame)
-    
+
         self.buttons = []
         # Создаем checkbuttons для каждого типа профессий
         for name, url in self.list_item:
@@ -91,8 +92,8 @@ class FirstPage:
 
         # Кнопки "Все ВКЛ", "Все ОТКЛ"
         self.buttons_on_off = ttk.Frame(self.first_windows)
-        self.turn_on_all = ttk.Button(self.buttons_on_off, text="Все ВКЛ", command=lambda: self.all_on_off("on"))
-        self.turn_off_all = ttk.Button(self.buttons_on_off, text="Все ВЫКЛ", command=lambda: self.all_on_off("off"))
+        self.turn_on_all = ttk.Button(self.buttons_on_off, text="ВКЛ все", command=lambda: self.all_on_off(1))
+        self.turn_off_all = ttk.Button(self.buttons_on_off, text="ВЫКЛ все", command=lambda: self.all_on_off(0))
 
 
 
@@ -112,13 +113,16 @@ class FirstPage:
         self.turn_off_all.pack(side=RIGHT)
         self.but.pack(padx=25, side=RIGHT)
 
-    def all_on_off(self, change):
-        if change == "on":
+    def all_on_off(self, on_or_off):
+        '''Функция сначала выберит все checkbuttons и
+        если было нажата кнопка ВЫКЛ тогда через invoke() отключает их всех'''
+        for ch in self.buttons:
+            ch.cb.state(['selected'])
+
+        if not on_or_off:
             for ch in self.buttons:
-                ch.cb.select()
-        elif change == "off":
-            for ch in self.buttons:
-                ch.cb.deselect()
+                ch.cb.invoke()
+
 
     def next_page_button(self):
         self.checked_buttons = []
@@ -134,7 +138,7 @@ class FirstPage:
             self.first_windows.destroy()
             SecondPage(self.checked_buttons, self.root)
         else:
-            ttk.messagebox.showerror("Ошибка!", "Вы не выбрали ни одну профессию\nПожалуйста выберите хотябы одну профессию")
+            messagebox.showerror("Ошибка!", "Вы не выбрали ни одну профессию\nПожалуйста выберите хотябы одну профессию")
 
 
 class SecondPage:
@@ -167,7 +171,8 @@ class SecondPage:
                                 )
 
         self.frame_select_place = ttk.LabelFrame(self.main_frame, text="Выберите место для сохранение файла")
-        self.selected_place = ttk.Entry(self.frame_select_place, width=58)
+        self.selected_place = ttk.Entry(self.frame_select_place, width=52)
+
 
         self.file_name = 'parsed_data'
 
@@ -178,9 +183,14 @@ class SecondPage:
             self.selected_place.insert(0, os.path.dirname(__file__)+"/parsed_data."+self.file_expansion_val.get())
             self.selected_place.config(state=DISABLED)
 
+        self.s = ttk.Style()
+        self.s.configure('TButton', font=('Helvetica', 8))
+
+
         self.button_save_as = ttk.Button(self.frame_select_place,
                                     text="Сохранить как",
                                     command=self.select_place_to_save,
+                                    style='TButton'
                                 )
 
 
@@ -196,11 +206,11 @@ class SecondPage:
         self.main_frame.pack(fill=BOTH, expand=1)
         self.lab.pack(pady=(15,4), fill=X, padx=15)
 
-        self.frame_file_expansion.pack(fill=X, padx=50, ipady=5)
+        self.frame_file_expansion.pack(fill=X, padx=40, ipady=5)
         self.xlsx_expansion.pack(fill=X, padx=15)
         self.csv_expansion.pack(fill=X, padx=15)
 
-        self.frame_select_place.pack(fill=X, padx=50, ipady=15, pady=25)
+        self.frame_select_place.pack(fill=X, padx=40, ipady=15, pady=25)
         self.selected_place.pack(side=LEFT, fill=X, padx=(15,0))
         self.button_save_as.pack(side=RIGHT, padx=15)
 
@@ -316,7 +326,7 @@ class ThirdPage:
 
 
     def stop(self):
-        ttk.messagebox.showinfo("Загрузка закончена", "Данные сохранены успешно" )
+        messagebox.showinfo("Загрузка закончена", "Данные сохранены успешно" )
         self.root.destroy()
             
 
