@@ -17,18 +17,23 @@ def ending_of_the_word(num: int, word: list):
         return word[2]
 
 
-
 class CheckButton:
     def __init__(self, master, title, url):
         self.var = StringVar()
         self.var.set("")
         self.title = title
+        
+        self.check_but_style = ttk.Style()
+        self.check_but_style.configure('ass.TCheckbutton', background='white')
 
-        self.cb = ttk.Checkbutton(
-            master, text=self.title, variable=self.var,
-            onvalue=url, offvalue="")
+        self.cb = ttk.Checkbutton(master,
+                                  text=self.title, 
+                                  variable=self.var,
+                                  onvalue=url, 
+                                  offvalue="",
+                                  style='ass.TCheckbutton'
+                                  )
         self.cb.pack(fill=X)
-
 
 
 class ScrollBar:
