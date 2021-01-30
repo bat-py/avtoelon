@@ -4,6 +4,8 @@ from ttkthemes import ThemedStyle
 from PIL import ImageTk, Image
 import os
 from tkinter import ttk
+import sys
+
 
 class Root(tk.Tk):
     def __init__(self):
@@ -13,7 +15,10 @@ class Root(tk.Tk):
         self.geometry('600x400')
         self.resizable(width=False, height=False)
        
-        self.iconbitmap('images/hh.ico')
+#        self.iconbitmap('hh.ico')
+
+        img = ImageTk.PhotoImage(Image.open('images/hh.ico'))
+        self.iconphoto(True, img)
 
         style = ThemedStyle(self)
         style.set_theme('breeze')
@@ -25,7 +30,8 @@ class Root(tk.Tk):
         self.top_menu.pack_propagate(False)
         
         # Image In the LEFT side of Top Menu
-        my_image = Image.open('images/hh.png')
+
+        my_image = Image.open('images/hh_top.png')
         my_image = my_image.resize((53, 53), Image.ANTIALIAS)
         image = ImageTk.PhotoImage(my_image)
         image_lab = tk.Label(self.top_menu, image=image)
@@ -38,11 +44,7 @@ class Root(tk.Tk):
         image_lab.grid(row=0, column=0, padx=7)
         doc_label.grid(row=0, column=1)
 
-
-
-
-
-
         gui.FirstPage(self)
         self.mainloop()
+
 Root()
